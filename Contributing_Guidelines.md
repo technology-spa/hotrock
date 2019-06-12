@@ -53,7 +53,7 @@ For something that is bigger than a one or two line fix:
 2. Do the changes in your fork 
 3. If you like the change and think the project could use it: 
     * Be sure you have followed the code style for the project. 
-    * Sign the [Individual Contributor License Agreement (ICLA)](../Individual_Contributor_License_Agreement) and the [Developer Certificate of Origin (DCO)](../Developer_Certificate_of_Origin) 
+    * Sign the [Individual Contributor License Agreement (ICLA)](../Individual_Contributor_License_Agreement) and the [Developer Certificate of Origin (DCO)](../master/Developer_Certificate_of_Origin.md) 
     * Note the [HOTROCK Code of Conduct.](../Code_of_Conduct) 
     * Send a pull request indicating that you have a ICLA on file. 
  
