@@ -54,7 +54,7 @@ For something that is bigger than a one or two line fix:
 3. If you like the change and think the project could use it: 
     * Be sure you have followed the code style for the project. 
     * Sign the [Individual Contributor License Agreement (ICLA)](../Individual_Contributor_License_Agreement) and the [Developer Certificate of Origin (DCO)](../master/Developer_Certificate_of_Origin.md) 
-    * Note the [HOTROCK Code of Conduct.](../Code_of_Conduct) 
+    * Note the HOTROCK [Code_of_Conduct.](../master/Code_of_Conduct.md) 
     * Send a pull request indicating that you have a ICLA on file. 
  
  
@@ -72,14 +72,14 @@ As a rule of thumb, changes are obvious fixes if they do not introduce any new f
 
 ## How to report a bug 
  
-If you find a security vulnerability, do NOT open an issue. Any security issues should be submitted directly to [hotrocker@technologyspa.com] instead. 
+If you find a security vulnerability, do NOT open an issue. Any security issues should be submitted directly to hotrocker@technologyspa.com instead. 
  
 In order to determine whether you are dealing with a security issue, ask yourself these two questions: 
  
 * Can I access something that's not mine, or something I shouldn't have access to? 
 * Can I disable something for other people? 
  
-If the answer to either of those two questions are "yes", then you're probably dealing with a security issue. Note that even if you answer "no" to both questions, you may still be dealing with a security issue, so if you're unsure, just email us at [hotrocker@technologyspa.com]. 
+If the answer to either of those two questions are "yes", then you're probably dealing with a security issue. Note that even if you answer "no" to both questions, you may still be dealing with a security issue, so if you're unsure, just email us at hotrocker@technologyspa.com. 
  
  
 ## How to file a bug report 
