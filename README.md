@@ -39,7 +39,7 @@ Say what the steps will be ...
 Add additional notes about how to deploy this on a live system 
  
 ## Contributing 
-Please read [CONTRIBUTING.md](../master/Contributing_Guidelines.md) 
+Please read our [Contributing_Guidelines](../master/Contributing_Guidelines.md) 
  
 ## Acknowledgments 
 * Hat tip to anyone whose code was used 
