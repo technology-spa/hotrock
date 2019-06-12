@@ -14,7 +14,7 @@ Please, don't use the issue tracker for support questions.
  
 Ensure cross-platform compatibility for every change that's accepted.  
  
-Ensure that code that goes into core meets all requirements in this [checklist:](../pull_request_checklist) 
+Ensure that code that goes into core meets all requirements in this [checklist:](../master/pull_request_checklist.md) 
  
 Create issues for any major changes and enhancements that you wish to make. Discuss things transparently and get community feedback. 
  
