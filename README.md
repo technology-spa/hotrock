@@ -9,7 +9,7 @@
 … 
 … 
  
-Please see our [contributing guidelines](../Contributing_Guidelines.md) before reporting an issue. 
+Please see our [contributing guidelines](../master/Contributing_Guidelines.md) before reporting an issue. 
  
 ## Getting Started 
  
@@ -39,7 +39,7 @@ Say what the steps will be ...
 Add additional notes about how to deploy this on a live system 
  
 ## Contributing 
-Please read [CONTRIBUTING.md](../CONTRIBUTING) 
+Please read [CONTRIBUTING.md](../master/Contributing_Guidelines.md) 
  
 ## Acknowledgments 
 * Hat tip to anyone whose code was used 
