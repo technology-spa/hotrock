@@ -1,7 +1,7 @@
 # Pull Request Checklist
 This is the checklist that I try to go through for every single pull request that I get. If you're wondering why it takes so long for me to accept pull requests, this is why. 
  
-## General 
+## General  
  
 - [ ] Is this change useful to me, or something that I think will benefit others greatly? 
 - [ ] Check for overlap with other PRs. 
