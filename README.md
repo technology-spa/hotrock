@@ -1,10 +1,15 @@
 # HOTROCK
 **HOTROCK** is a (_mostly_) pre-configured implementation of opensource components that are containerized and ready for deployment. The pre-configured list of ingestion end points is as follows: 
- 
+
++ _Amazon Cloudwatch_
++ _AWS Lambda_
++ _Azure ATP_
 + _Syslogs_ 
 + _Webserver logs_ 
 + _Firewall logs_ 
-+ _...Etc_ 
++ _Microsoft Event Logs_
++_Appliance Logs_
++ _Network Device Logs_
 … **NEEDS TO BE A REAL LIST**
 … 
 … 
