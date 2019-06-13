@@ -8,9 +8,9 @@
 + _Webserver logs_ 
 + _Firewall logs_ 
 + _Microsoft Event Logs_
-+_Appliance Logs_
++ _Appliance Logs_
 + _Network Device Logs_
-… **NEEDS TO BE A REAL LIST**
++ … **NEEDS TO BE A REAL LIST**
 … 
 … 
  
