@@ -1,4 +1,26 @@
 # HOTROCK
+
+<!-- MDTOC maxdepth:6 firsth1:1 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
+
+- [HOTROCK](#HOTROCK)
+   - [Getting Started](#getting-started)
+   - [Dependencies needed to complete e2e deployment (Assumes Ubuntu OS)](#prerequisites)
+   - [Installing](#installing)
+   - [Deployment](#deployment)
+   - [Contributing](#contributing)
+   - [Acknowledgements](#acknowledgments)
+   - [Useful Links/References](#useful-linksreferences)
+   - [TODO](#todo)
+      - [Kubernetes](#kubernetes)
+
+<!-- /MDTOC -->
+
+---
+
+**See detailed READMEs under `./docs`.**
+
+
+
 **HOTROCK** is a (_mostly_) pre-configured implementation of opensource components that are containerized and ready for deployment. The pre-configured list of ingestion end points is as follows: 
 
 + _Amazon Cloudwatch_
@@ -22,17 +44,35 @@ gem install **HOTROCK**
  
 ## Prerequisites 
 
-The dependencies listed are required if you wish to run the library. You can also run script/bootstrap to fetch them all. **_[obviously not a real list of prerequisites]_** 
++   `htpasswd` for generating credentials:
 
-+ .markdown, .mdown, .mkdn, .md -- gem install commonmarker (https://github.com/gjtorikian/commonmarker) 
-+ .textile -- gem install RedCloth (https://github.com/jgarber/redcloth) 
-+ .rdoc -- gem install rdoc -v 3.6.1 
-+ .org -- gem install org-ruby (https://github.com/wallyqs/org-ruby) 
-+ .creole -- gem install creole (https://github.com/larsch/creole) 
-+ .mediawiki, .wiki -- gem install wikicloth (https://github.com/nricciar/wikicloth) 
-+ .rst -- pip install docutils 
-+ .asciidoc, .adoc, .asc -- gem install asciidoctor (http://asciidoctor.org) 
-+ .pod -- Pod::Simple::XHTML comes with Perl >= 5.10. Lower versions should install Pod::Simple from CPAN. 
+```bash
+apt install apache2-utils
+```
+
++   `aws-cli-authenticator` ([Docs](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)):
+
+```bash
+sh -c 'curl -o /usr/local/bin/aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.11.5/2018-12-06/bin/linux/amd64/aws-iam-authenticator && chmod 755 /usr/local/bin/aws-iam-authenticator'
+```
+
++   `aws-cli` snap (They keep a fairly old version in the `stable` channel):
+
+```bash
+snap install aws-cli --classic --channel=edge
+```
+
++   `aws-cli` on **Ubuntu** requires two packages in order to authenticate with docker to push images to the **ACR**:
+
+```bash
+apt install -y gnupg2 pass
+```
+
++   `helm` is used exclusively for deployment and managing all workloads in **Kubernetes**, including `LoadBalancer`s:
+
+```bash
+snap install helm
+```
  
 ## Installing 
 
@@ -45,9 +85,22 @@ Add additional notes about how to deploy this on a live system
  
 ## Contributing 
 Please read our [Contributing_Guidelines](../master/Contributing_Guidelines.md) 
+
+## Useful Links/References
+
++   Helm Charts: https://github.com/helm/charts/tree/master/stable
+
+## TODO
+
+### Kubernetes
+
+1.  Add encryption to Terraform module:
+https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/workers.tf#L29
+https://kubernetes.io/docs/concepts/storage/storage-classes/#aws-ebs
+https://www.terraform.io/docs/providers/aws/d/launch_configuration.html
+
  
 ## Acknowledgments 
 * Hat tip to anyone whose code was used 
 * Inspiration 
 * etc 
- 
