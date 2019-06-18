@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "fluentd.fullname" . }}-int
+  labels:
+    app.kubernetes.io/name: {{ include "fluentd.name" . }}
+    helm.sh/chart: {{ include "fluentd.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.service_int.annotations }}
+  annotations:
+{{ toYaml .Values.service_int.annotations | indent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.service_int.type }}
+  ports:
+    - port: {{ .Values.service_int.port }}
+      targetPort: beats
+      protocol: TCP
+      name: beats
+  selector:
+    app.kubernetes.io/name: {{ include "fluentd.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

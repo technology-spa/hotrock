@@ -1,0 +1,70 @@
+# Default values for fluentd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# using a custom image!
+image:
+  repository: "980131763484.dkr.ecr.us-east-2.amazonaws.com/chipper/fluentd"
+  tag: "latest"
+  pullPolicy: "Always"
+
+nameOverride: ""
+fullnameOverride: ""
+
+service_ext:
+  type: LoadBalancer  # (ClusterIP|LoadBalancer)
+  port: 443
+  # tls is handled by Fluentd
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+    # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+    # service.beta.kubernetes.io/aws-load-balancer-healthcheck-healthy-threshold: "3"
+    # service.beta.kubernetes.io/aws-load-balancer-healthcheck-unhealthy-threshold: "3"
+    # service.beta.kubernetes.io/aws-load-balancer-healthcheck-timeout: "5"
+    # service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval: "10"
+service_int:
+  type: ClusterIP  # (ClusterIP|LoadBalancer)
+  port: 5044
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+ingress:
+  enabled: true
+  annotations: {}
+  paths: ["/"]
+  hosts: ["chip-fd.adatechnologists.com"]
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    memory: "700Mi"
+  requests:
+    memory: "700Mi"
+
+nodeSelector:
+  chipper_autoscaling: "true"
+  chipper_ingestor: "true"
+
+tolerations: []
+
+affinity: {}
+
+# fluentd
+rbac:
+  create: true
+serviceAccount:
+  create: true
+parsers:
+  enabled: false
+metrics:
+  enabled: false
+sharedKey: nil
+maxUnavailable: 1

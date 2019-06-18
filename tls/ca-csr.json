@@ -1,0 +1,17 @@
+{
+    "CN": "adatechnologists.com",
+    "hosts": [
+        "chip-fd.adatechnologists.com"
+    ],
+    "key": {
+        "algo": "ecdsa",
+        "size": 256
+    },
+    "names": [
+        {
+            "C": "US",
+            "ST": "TX",
+            "L": "Dallas"
+        }
+    ]
+}

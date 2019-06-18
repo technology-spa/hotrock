@@ -1,0 +1,28 @@
+---
+# https://github.com/helm/charts/tree/master/stable/consul
+# https://hub.docker.com/_/consul
+ImageTag: "1.4.1"
+Replicas: 3
+acl:
+  enabled: false
+uiService:
+  type: "ClusterIP"
+  annotations:
+    traefik.ingress.kubernetes.io/affinity: "true"
+uiIngress:
+  hosts:
+    - "chip-cl.adatechnologists.com"
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/auth-remove-header: "true"
+    traefik.ingress.kubernetes.io/auth-secret: consul-basic-auth
+    traefik.ingress.kubernetes.io/auth-type: basic
+Resources:
+  limits:
+    memory: "200Mi"
+  requests:
+    memory: "200Mi"
+maxUnavailable: 1
+nodeSelector:
+  chipper_static: "true"

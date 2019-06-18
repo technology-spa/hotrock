@@ -1,0 +1,60 @@
+# there's an appVersion, and image.tag. Keep them in sync.
+appVersion: "6.5.4"
+client:
+  initResources:
+    limits:
+      memory: 1000Mi
+    requests:
+      memory: 1000Mi
+  nodeSelector:
+    chipper_static: "true"
+  replicas: 1
+  resources:
+    limits:
+      cpu: 2
+      memory: 1000Mi
+    requests:
+      memory: 1000Mi
+cluster:
+  env:
+    MINIMUM_MASTER_NODES: "2"
+    XPACK_MONITORING_ENABLED: true
+  xpackEnable: true
+data:
+  initResources:
+    limits:
+      memory: 2000Mi
+    requests:
+      memory: 2000Mi
+  nodeSelector:
+    chipper_static: "true"
+  persistence:
+    size: 30Gi
+  replicas: 2
+  resources:
+    limits:
+      cpu: 2
+      memory: 2000Mi
+    requests:
+      memory: 2000Mi
+image:
+  # non-oss image needed for xpaack
+  repository: docker.elastic.co/elasticsearch/elasticsearch
+  tag: "6.5.4"
+master:
+  initResources:
+    limits:
+      memory: 1000Mi
+    requests:
+      memory: 1000Mi
+  nodeSelector:
+    chipper_static: "true"
+  persistence:
+    size: 5Gi
+  replicas: 2
+  resources:
+    limits:
+      cpu: 2
+      memory: 1000Mi
+    requests:
+      memory: 1000Mi

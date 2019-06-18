@@ -1,0 +1,52 @@
+# https://github.com/helm/charts/tree/master/stable/elasticsearch#configuration
+# https://github.com/elastic/kibana/blob/master/config/kibana.yml
+# https://www.elastic.co/guide/en/kibana/current/settings.html
+# map configuration properties here.
+files:
+  kibana.yml:
+    # elasticsearch.hosts: "http://elasticsearch-client:9200"
+    elasticsearch.url: "http://elasticsearch-client:9200"
+    logging.verbose: true
+image:
+  tag: "6.5.4"
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/auth-remove-header: "true"
+    traefik.ingress.kubernetes.io/auth-secret: kibana-basic-auth
+    traefik.ingress.kubernetes.io/auth-type: basic
+  enabled: true
+  hosts:
+    - chip-kb.adatechnologists.com
+persistentVolumeClaim:
+  enabled: true
+  existingClaim: false
+plugins:
+  enabled: true
+  reset: false
+  values:
+    - "wazuh,3.8.2,https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.5.4.zip"
+    - "logtrail,0.1.30,https://github.com/sivasamyk/logtrail/releases/download/v0.1.30/logtrail-6.5.4-0.1.30.zip"
+    - "indices_view,6.5.4,https://github.com/TrumanDu/indices_view/releases/download/v6.5.4/indices_view-6.5.4.zip"
+    # - "kibana-prometheus-exporter,6.5.4,https://github.com/pjhampton/kibana-prometheus-exporter/releases/tag/6.5.4"
+replicaCount: 1
+resources:
+  limits:
+    memory: "3Gi"
+  requests:
+    memory: "3Gi"
+service:
+  clusterIP: None
+  externalPort: 5601
+securityContext:
+  enabled: true
+serviceAccount:
+  create: true
+nodeSelector:
+  chipper_frontend: "true"
+# readinessProbe:
+#   enabled: true
+#   # plugins take FOREVER
+#   initialDelaySeconds: 120
+# livenessProbe:
+#   enabled: true
