@@ -1,3 +1,0 @@
-- hosts: all:!wazuh-manager
-  roles:
-   - ansible-wazuh-agent
