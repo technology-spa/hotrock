@@ -1,0 +1,19 @@
+{{- if .Values.rbac.create -}}
+apiVersion: {{ template "rbac.apiVersion" . }}
+kind: RoleBinding
+metadata:
+  labels:
+    app: {{ template "wazuh.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "wazuh.fullname" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "wazuh.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "wazuh.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end -}}

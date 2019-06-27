@@ -1,0 +1,24 @@
+# update values following creation of the relevant DNS records.
+
+# resource "aws_route53_zone" "hotrock" {
+#   name = "domain.tld"
+#   tags = "${local.tags}"
+# }
+
+resource "aws_route53_record" "kibana" {
+  zone_id = "${aws_route53_zone.hotrock.zone_id}"
+  zone_id = ""
+  name    = "hotrock-kb.domain.tld"
+  type    = "CNAME"
+  ttl     = "60"
+  records = "${var.dns_nginx_ingress_external}"
+}
+
+resource "aws_route53_record" "fluentd" {
+  zone_id = "${aws_route53_zone.hotrock.zone_id}"
+  zone_id = ""
+  name    = "hotrock-fd.domain.tld"
+  type    = "CNAME"
+  ttl     = "60"
+  records = "${var.dns_nginx_ingress_external}"
+}

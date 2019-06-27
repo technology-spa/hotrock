@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "wazuh.fullname" . }}-agents
+  labels:
+    app.kubernetes.io/name: {{ include "wazuh.name" . }}
+    helm.sh/chart: {{ include "wazuh.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.agents.service.annotations }}
+  annotations:
+{{ toYaml .Values.agents.service.annotations | indent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.agents.service.type }}
+  ports:
+    - name: agent-events
+      targetPort: agent-events
+      port: 1514
+    - name: ossec-authd
+      targetPort: ossec-authd
+      port: 1515
+  selector:
+    app.kubernetes.io/name: {{ include "wazuh.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  

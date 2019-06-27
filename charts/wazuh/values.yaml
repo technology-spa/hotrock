@@ -1,0 +1,77 @@
+# Default values for wazuh.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+agents:
+  service:
+    type: ClusterIP
+    annotations: {}
+int:
+  service:
+    type: ClusterIP
+    annotations: {}
+
+image:
+  repository: "wazuh/wazuh"
+  tag: 3.9.2_7.1.1
+  pullPolicy: "IfNotPresent"
+
+nameOverride: ""
+fullnameOverride: ""
+
+ingress:
+  annotations: {}
+  enabled: false
+  hosts: [""]
+  paths: ["/"]
+  tls: []
+
+resources: {}
+  # limits:
+  #   cpu: 1
+  #   memory: 1Gi
+  # requests:
+  #   cpu: 10m
+  #   memory: 1Gi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - wazuh
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+      weight: 100
+
+# replicas for masters/workers can only be 1 atm. Env variables needed for some configs:
+# https://github.com/wazuh/wazuh/issues/2249
+masters:
+  replicas: 1
+  persistence:
+    enabled: true
+    name: data
+    size: 10Gi
+    accessModes: ["ReadWriteOnce"]
+workers:
+  replicas: 0
+
+rbac:
+  create: true
+serviceAccount:
+  create: true
+  name: ""
+
+env:
+  WAZUH_API_SERVICE_USER: hotrock
+  ELASTICSEARCH_URL: https://hotrock-es:9200
+
+volumeFromSecrets:
+  secretName: wazuh-passwords

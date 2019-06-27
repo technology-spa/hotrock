@@ -1,0 +1,58 @@
+# https://github.com/helm/charts/tree/master/stable/elasticsearch#configuration
+# https://github.com/elastic/kibana/blob/master/config/kibana.yml
+# https://www.elastic.co/guide/en/kibana/current/settings.html
+affinity: {}
+files:
+  kibana.yml:
+    elasticsearch.hosts: "https://hotrock-es:9200"
+    elasticsearch.username: svc_kibana
+    elasticsearch.password: ES_PASSWORD_GOES_HERE
+    elasticsearch.ssl.verificationMode: "none"
+    logging.verbose: false
+image:
+  tag: "7.1.1"
+  repository: docker.elastic.co/kibana/kibana
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: nginx-external
+    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-staging
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    nginx.ingress.kubernetes.io/ssl-ciphers: "EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA512:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:ECDH+AESGCM:ECDH+AES256:DH+AESGCM:DH+AES256:RSA+AESGCM:!aNULL:!eNULL:!LOW:!RC4:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS"
+    # nginx.ingress.kubernetes.io/auth-type: basic
+    # nginx.ingress.kubernetes.io/auth-secret: basic-auth-kibana
+  enabled: true
+  hosts: ["hotrock-kb.domain.tld"]
+  tls:
+    - hosts: ["hotrock-kb.domain.tld"]
+      secretName: tls-hotrock-kibana
+plugins:
+  enabled: false
+  reset: false
+  values:
+    # https://github.com/wazuh/wazuh-kibana-app#older-packages
+    - "wazuh,3.9.2,https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.2_7.1.1.zip"
+replicaCount: 1
+# initContainer is cpu hungry
+resources:
+  limits:
+    cpu: 4
+    memory: "2Gi"
+  requests:
+    cpu: 10m
+    memory: "2Gi"
+service:
+  annotations: {}
+  clusterIP: None
+  externalPort: 5601
+securityContext:
+  enabled: true
+serviceAccount:
+  create: true
+# FYI plugins can take FOREVER
+readinessProbe:
+  enabled: false
+  successThreshold: 2
+livenessProbe:
+  enabled: false
+  successThreshold: 2

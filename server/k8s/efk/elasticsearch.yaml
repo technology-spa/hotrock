@@ -1,0 +1,32 @@
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1alpha1
+kind: Elasticsearch
+metadata:
+  name: hotrock
+spec:
+  version: 7.1.1
+  nodes:
+  - nodeCount: 1
+    config:
+      node.master: true
+      node.data: true
+      node.ingest: true
+    volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: gp2-encrypted
+    podTemplate:
+      spec:
+        affinity: {}
+        containers:
+        - name: elasticsearch
+          resources:
+            limits:
+              cpu: 1
+              memory: 4Gi

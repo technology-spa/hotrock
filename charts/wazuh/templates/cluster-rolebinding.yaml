@@ -1,0 +1,17 @@
+{{- if .Values.rbac.create }}
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "wazuh.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "wazuh.name" . }}
+    helm.sh/chart: {{ include "wazuh.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  name: {{ template "wazuh.fullname" . }}
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["configmaps"]
+  verbs: ["get", "watch", "list"]
+rules: []
+{{- end }}

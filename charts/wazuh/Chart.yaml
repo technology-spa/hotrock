@@ -1,0 +1,9 @@
+apiVersion: v1
+appVersion: "3.9.2"
+description: Run Wazuh Managers in Kubernetes
+name: wazuh
+version: 0.1.0
+keywords:
+- wazuh
+- siem
+- elasticsearch

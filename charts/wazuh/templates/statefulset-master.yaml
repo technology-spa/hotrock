@@ -1,0 +1,133 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: "{{ template "wazuh.fullname" . }}-master"
+  labels:
+    app.kubernetes.io/name: {{ include "wazuh.name" . }}
+    helm.sh/chart: {{ include "wazuh.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  serviceName: "{{ template "wazuh.fullname" . }}-int"
+  replicas: {{ .Values.masters.replicas }}
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "wazuh.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      name: "{{ template "wazuh.fullname" . }}"
+      labels:
+        app.kubernetes.io/name: {{ include "wazuh.name" . }}
+        app.kubernetes.io/component: master
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- if .Values.priorityClassName }}
+      priorityClassName: "{{ .Values.priorityClassName }}"
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: wazuh-api
+              containerPort: 55000
+            - name: agent-events
+              containerPort: 1514
+            - name: ossec-authd
+              containerPort: 1515
+            - name: wazuh-cluster
+              containerPort: 1516
+          lifecycle:
+            postStart:
+              exec: 
+                # this is a temporary hack
+                command: ["/bin/bash", "-c", "mkdir -p /var/log/filebeat && touch /var/log/filebeat/filebeat && cd /var/ossec/api/configuration/auth && node htpasswd -bc user $WAZUH_API_SERVICE_USER $WAZUH_API_SERVICE_PASSWORD && service wazuh-api stop; service wazuh-api start"]
+            preStop:
+              exec:
+                command: ["/bin/bash", "-c", "/var/ossec/bin/ossec-control stop; sleep 10s"]
+          env:
+          {{- range $key, $value := .Values.env }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+            - name: WAZUH_API_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: WAZUH_API_SERVICE_PASSWORD
+                  name: {{ .Values.volumeFromSecrets.secretName }}
+          readinessProbe:
+            tcpSocket:
+              port: wazuh-api
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: wazuh-api
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: {{ .Values.masters.persistence.name | quote }}
+              mountPath: "/var/ossec/data"
+            - name: {{ .Values.volumeFromSecrets.secretName }}
+              mountPath: /wazuh-config-mount/etc/authd.pass
+              subPath: "authd.pass"
+              readOnly: true
+            - name: filebeat
+              mountPath: "/etc/filebeat/filebeat.yml"
+              subPath: "filebeat.yml"
+              readOnly: true
+            - name: ossec
+              mountPath: "/wazuh-config-mount/etc/ossec.conf"
+              subPath: "ossec.conf"
+              readOnly: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: {{ .Values.volumeFromSecrets.secretName }}
+          secret:
+            secretName: {{ .Values.volumeFromSecrets.secretName }}
+            items:
+              - key: authd.pass
+                path: authd.pass
+                mode: 0660
+        - name: filebeat
+          configMap:
+            name: {{ template "wazuh.fullname" . }}
+            items:
+            - key: filebeat.yml
+              path: filebeat.yml
+        - name: ossec
+          configMap:
+            name: {{ template "wazuh.fullname" . }}
+            items:
+            - key: master_ossec.conf
+              path: ossec.conf
+  {{- if .Values.masters.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .Values.masters.persistence.name | quote }}
+        labels:
+          app.kubernetes.io/name: {{ include "wazuh.name" . }}
+          app.kubernetes.io/instance: {{ .Release.Name }}
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: {{ .Values.masters.persistence.size | quote }}
+  {{- end }}

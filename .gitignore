@@ -1,0 +1,24 @@
+# terraform
+**/.terraform
+**/*.tfstate*
+**/crash.log
+**/planfile
+
+# k8s
+**/kubeconfig_*
+**/config-map-aws-auth*.yaml
+
+# python
+**/*.idea
+**/venv/
+
+# java
+**/*.jar
+
+# sensitive info
+**/*key.pem
+**/*.key
+**/agent-registration-auth.txt
+
+# misc
+**/*.csr

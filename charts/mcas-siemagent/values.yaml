@@ -1,0 +1,35 @@
+# Default values for mcas-siemagent.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+agent:
+  # token obtained through O365 UI. Used for auth. Injected as environment variable.
+  token_secret_name: mcas-siemagent-env-secrets
+
+image:
+  repository: YOUR_REPO:IMAGE_HERE
+  tag: YOUR_TAG_HERE
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+rbac:
+  create: true
+serviceAccount:
+  create: true
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 1Gi
+  # requests:
+  #   cpu: 10m
+  #   memory: 1Gi
+
+nodeSelector: {}
+tolerations: []
+
+affinity: {}

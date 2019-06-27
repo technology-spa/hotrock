@@ -1,0 +1,31 @@
+# all workers talk only to the master. This service resolves to the master.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "wazuh.fullname" . }}-int
+  labels:
+    app.kubernetes.io/name: {{ include "wazuh.name" . }}
+    helm.sh/chart: {{ include "wazuh.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.int.service.annotations }}
+  annotations:
+{{ toYaml .Values.int.service.annotations | indent 4 }}
+{{- end }}
+spec:
+  # TODO if/then for headless
+  type: {{ .Values.int.service.type }}
+  clusterIP: "None"
+  ports:
+    - name: wazuh-api
+      targetPort: wazuh-api
+      port: 55000
+    - name: wazuh-cluster
+      targetPort: wazuh-cluster
+      port: 1516
+    - name: int-syslog
+      targetPort: int-syslog
+      port: 514
+  selector:
+    app.kubernetes.io/name: {{ include "wazuh.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

@@ -1,0 +1,17 @@
+{{- if .Values.rbac.create }}
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "mcas-siemagent.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "mcas-siemagent.name" . }}
+    helm.sh/chart: {{ include "mcas-siemagent.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  name: {{ template "mcas-siemagent.fullname" . }}
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["configmaps"]
+  verbs: ["get", "watch", "list"]
+rules: []
+{{- end }}

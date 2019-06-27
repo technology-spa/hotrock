@@ -1,0 +1,89 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ template "wazuh.fullname" . }}-worker"
+  labels:
+    app.kubernetes.io/name: {{ include "wazuh.name" . }}
+    helm.sh/chart: {{ include "wazuh.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  serviceName: "{{ template "wazuh.fullname" . }}-int"
+  replicas: {{ .Values.workers.replicas }}
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "wazuh.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      name: "{{ template "wazuh.fullname" . }}"
+      labels:
+        app.kubernetes.io/name: {{ include "wazuh.name" . }}
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+{{- if .Values.priorityClassName }}
+      priorityClassName: "{{ .Values.priorityClassName }}"
+{{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: agent-events
+              containerPort: 1514
+            - name: int-syslog
+              containerPort: 514
+          env:
+          {{- range $key, $value := .Values.env }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+          readinessProbe:
+            tcpSocket:
+              port: agent-events
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: agent-events
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: filebeat
+              mountPath: "/etc/filebeat/filebeat.yml"
+              subPath: "filebeat.yml"
+              readOnly: true
+            - name: ossec
+              mountPath: "/wazuh-config-mount/etc/ossec.conf"
+              subPath: "ossec.conf"
+              readOnly: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: filebeat
+          configMap:
+            name: {{ template "wazuh.fullname" . }}
+            items:
+            - key: filebeat.yml
+              path: filebeat.yml
+        - name: ossec
+          configMap:
+            name: {{ template "wazuh.fullname" . }}
+            items:
+            - key: worker_ossec.conf
+              path: ossec.conf
