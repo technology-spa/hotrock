@@ -5,7 +5,7 @@
 1. Clone this repo:
 
 ```bash
-git clone https://github.com/technology-spa/HOTROCK && cd server/aws
+git clone https://github.com/technology-spa/hotrock && cd server/aws
 ```
 
 2. Make edits to values in [`variables.tf`](../../server/aws/variables.tf) as-desired.
