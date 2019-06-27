@@ -23,7 +23,7 @@ See [docs](docs) to get started.
 
 This repository contains files to build a **Kubernetes** Cluster in **AWS** for the purpose of storing and presenting data with an [EFK]() stack.
 
-The steps below will walk you through the process of building your own **EFK** stack, which will be able to ingest logs over the internet with an HTTP client (by default). However, any Fluentd's chart/configuration can be modified to support most methods of shipping logs. It is not meant to be production-ready, but to give a jumping-off point for building and maintaining your stack.
+The steps below will walk you through the process of building your own **EFK** stack, which will be able to ingest logs over the internet with an HTTP client (by default). However, Fluentd's chart/configuration can be modified to support most methods of shipping logs. It is not meant to be production-ready, but to give a jumping-off point for building and maintaining your stack.
 
 **hotrock** requires and consumes the following resources
 
