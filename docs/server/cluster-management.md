@@ -5,7 +5,7 @@
 1. Clone this repo:
 
 ```bash
-git clone https://github.com/technology-spa/hotrock && cd server/aws
+git clone https://github.com/technology-spa/HOTROCK && cd server/aws
 ```
 
 2. Make edits to values in [`variables.tf`](../../server/aws/variables.tf) as-desired.
@@ -60,6 +60,34 @@ kube-system   aws-node-m8bcr             1/1     Running   0          39m
 kube-system   coredns-65f768bbc8-scwnj   1/1     Running   0          42m
 kube-system   coredns-65f768bbc8-vntqq   1/1     Running   0          42m
 kube-system   kube-proxy-8vjxv           1/1     Running   0          39m
+```
+
+## Helm Initialization
+
++ [`helm` and RBAC](https://github.com/helm/helm/blob/master/docs/rbac.md)
++ [`helm` Charts](https://github.com/helm/charts)
++ [Using `helm`](https://github.com/helm/helm/blob/master/docs/using_helm.md#the-format-and-limitations-of---set)
+
+1. Create a **powerful** service account for `helm` (`tiller`):
+
+```bash
+kubectl create -f "./server/k8s/helm-rbac.yaml"
+```
+
+2. Install `helm`' **Tiller** pod into k8s cluster:
+
+```bash
+helm init --service-account tiller --upgrade
+```
+
+3. Create a new `storageclass` and set to default so that any volumes created will be on encrypted EBS volumes:
+
+```bash
+kubectl create -f './server/k8s/storageclass-encrypted.yaml'; \
+kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.beta.kubernetes.io/is-default-class":"false"}}}'; \
+kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'; \
+kubectl patch storageclass gp2-encrypted -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'; \
+kubectl get storageclass
 ```
 
 ## Cluster Teardown
