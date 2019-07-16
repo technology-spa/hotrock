@@ -34,8 +34,8 @@ To simplify this, IIS-Log-Locator.ps1 will determine unique logpaths and #Fields
 - A regex pattern can be written from this fields list. The default parsing pattern should have the regex for each individual column
 
 Default IIS Fields: 
-\#Fields Date, Time, ClientIP, UserName, ServerIP, Method, UriStem, UriQuery, TimeTaken, HttpStatus, Win32Status, ServerPort, UserAgent, HttpSubStatus, and Referer.
+#Fields: date time c-ip cs-username s-sitename s-computername s-ip s-port cs-method cs-uri-stem cs-uri-query sc-status sc-win32-status sc-bytes cs-bytes time-taken cs-version cs-host cs(User-Agent) cs(Cookie) cs(Referer)
 
 Default IIS Regex: 
 
-    /(?<time>[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}) (?<c-ip>\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b) (?<username>\S+) (?<s-ip>\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)  (?<method>\w+|-) (?<uri-stem>\S*) (?<uri-query>\S*) (?<time-taken>\d+|-) (?<status>\d+|-) (?<win32-status>\d+|-) (?<s-port>\d+) (?<bytes-sent>\d+|-) (?<bytes-received>\d+|-) (?<time-taken>\d+|-) (?<user-agent>[\S]*) (?<substatus>\d+|-) (?<referrer>[\S]*)/
+/^(?<time>[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}) (?<c-ip>\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b) (?<cs-username>\S+) (?<s-sitename>\S+) (?<hostname>\S+) (?<s-ip>\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b) (?<s-port>\d+|-) (?<cs-method>\w+|-) (?<cs-uri-stem>\S*) (?<cs-uri-query>\S*) (?<sc-status>\d+|-) (?<sc-win32-status>\d+|-) (?<sc-bytes>\d+|-) (?<cs-bytes>\d+|-) (?<time_taken>\d+|-) (?<cs-version>[\S]*) (?<cs-host>[\S]*) (?<cs-user-agent>[\S]*) (?<cs-cookie>[\S]*) (?<cs-referer>[\S]*)/
