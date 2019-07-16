@@ -68,7 +68,7 @@ The provided example Fluentd configuration has the following setup:
 To configure these inputs: 
 1. [Aggregator Configuration](client/aggregator.md)
 
-2. [Elastic Beat Deployment and Configuration](client/beat-deployment.md)
+2. [Elastic Beat Deployment and Configuration](client/beats-deployment.md)
 
 3. [Wazuh Agent Deployment](client/wazuh-deployment.md)
 
