@@ -2,6 +2,7 @@
 Powershell Scripts provided in **docs/client/powershell** will assist in this process. These scripts should work for any beat. We will specifically be referencing: 
  - Winlogbeat
  - Filebeat
+ - Auditbeat
 
 ## Installing Beats on Windows
 Open Install-Beat.ps1 as an administrator to install a beat on single machine for initial testing
@@ -14,23 +15,34 @@ Modify the following variables in the script before running:
 
 > $installVersion = "6.8.0"   #Version to be Installed - e.g "7.0.1" 
 
+## Manually Load Beat Template into Elasticsearch 
+Since we are connecting to Fluentd, the template will need to be loaded manually. [Here is the Elastic documenation showing how to do this](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-template.html#load-template-manually-alternate).] Scattered throughout this template are some settings that we have modified for our configuration. These may differ based on your needs.
 
-## Winlogbeat Configuration
+For Index Patterns, we are using the format "beat-windows.$beatprefix". e.g. "beat-windows.audit*". 
+
+For our purposes, we have decided on this shard allocation and refresh interval. 
+> "number_of_shards" : "3",
+> "number_of_replicas" : "2",
+> "refresh_interval": "30s" 
+
+
+## Winlogbeat and Auditbeat Configuration
 Navigate to directory where winlogbeat is installed 
 Open winlogbeat.yml 
-Add Aggregator IP and change to Port 5044:
+Add Aggregator IP and change to Port 5044. We have additionally added a tag which we will reference in our Fluentd config to make sure it routes correctly. 
 
 ```yaml
 output.elasticsearch:
    # Array of hosts to connect to.
    hosts: ["localhost:5044"]
+   tags: [winlog]
 ```
 
 Restart winlogbeat
 
 >   `Restart-Service winlogbeat`
 
-This is all the configuration needed for a basic winlogbeat deployment
+This is all the configuration needed for a basic winlogbeat or auditbeat deployment
 For more information on configuration, see the [Winlogbeat Docs](https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-winlogbeat-options.html)
 
 *If both Aggregator and Ingestor have been configured, this data should begin flowing into Kibana*. 

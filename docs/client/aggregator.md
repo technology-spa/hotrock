@@ -1,4 +1,5 @@
 # **Aggregator Set Up**
+Aggregators can be set up in any environment where you will be collecting logs to ship to Hotrock. This can be on-prem or in the cloud. The main function of this Fluentd instance will be to take and securely send the logs to the ingestor within the Hotrock Cluster. 
 
 ## **Aggregator Requirements**
 
@@ -57,7 +58,7 @@ Parsing, tagging, and other operations will be handled at the Ingestor
 Fluentd has a [stdout output plugin](https://docs.fluentd.org/output/stdout) that is useful for testing purposes:
 >    <match **> 
 >	  		\type stdout
->	 \<match> 
+>	 \</match> 
 	 
 This will send logs to: 
 >/var/log/td-agent.log

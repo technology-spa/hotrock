@@ -112,3 +112,19 @@ curl -ks -X POST "https://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_ob
   }
 }' | jq
 ```
+
+#Getting Started with Kibana
+There is a great deal of documentation out there on how to best utilize Kibana. Below, I've included links to a few videos/docs to help you get started making visualizations and dashboards. 
+
+##General
+[Kibana Documentation](https://www.elastic.co/guide/en/kibana/current/introduction.html)
+[Organizing Kibana with Spaces](https://www.youtube.com/watch?v=BqvrL8j_TKI&list=PLhLSfisesZItMosBx0csZGld0n2htxXMO&index=2)
+
+
+##Visualization
+[Visualization Basics](https://www.elastic.co/guide/en/kibana/current/tutorial-visualizing.html)
+[Understanding Kibana Aggregations](https://www.youtube.com/watch?v=j-eCKDhj-Os)
+
+### Timelion
+Timelion is a graphing alternative within Kibana that can be used to run more complex operations than are generally found in the other graphs. Please see the short video below from Elastic on getting started with it. 
+[Timelion: Time Series Analytics for Kibana](https://www.youtube.com/watch?v=-sgZdW5k7eQ)

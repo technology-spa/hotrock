@@ -23,12 +23,7 @@ kubectl -n client scale deployment fluentd-ext --replicas 0 --current-replicas 1
 kubectl -n client scale sts wazuh-master --replicas 0 --current-replicas 1 ;\
 kubectl -n client scale deployment wazuh-worker --replicas 0 --current-replicas 1 ;\
 kubectl -n client scale deployment mcas-siemagent --replicas 0 --current-replicas 1
-```
-3. Delete Fluent-Bit objects since a Kubernetes Daemonset cannot be scaled. They collect container logs and forward to Elasticsearch.
-```bash
-helm del --purge fluent-bit
-```
-4. After a little bit of time, ingestion should stop.
+3. After a little bit of time, ingestion should stop.
 
 ##### Backups
 
@@ -42,8 +37,7 @@ helm del --purge fluent-bit
 kubectl -n client scale deployment fluentd --replicas 4 --current-replicas 0 ; \
 kubectl -n client scale sts wazuh-master --replicas 1 --current-replicas 0 ;\
 kubectl -n client scale deployment wazuh-worker --replicas 1 --current-replicas 0 ;\
-kubectl -n client scale deployment mcas-siemagent --replicas 1 --current-replicas 0 ;\
-helm install --namespace monitoring --name fluent-bit stable/fluent-bit --values './server/k8s/helm/misc-values/fluent-bit.yaml' --version 2.4.3
+kubectl -n client scale deployment mcas-siemagent --replicas 1 --current-replicas 0
 ```
 2. Create an updated Docker image for Kibana (see docs on Kibana), update the image tag referenced in the Helm chart, then upgrade Kibana to match Elasticsearch's new version:
 ```bash

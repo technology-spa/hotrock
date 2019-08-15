@@ -1,0 +1,69 @@
+### Date line is added to easily verify all servers updated correctly via powershell
+
+filebeat.inputs:
+#HTTPERR logs seem to be pretty consistent location and format wise 
+-   type: log
+    enabled: true  
+    paths:
+        - C:\Windows\System32\LogFiles\HTTPERR\*
+    ignore_older: 0h
+    #tags added in order to direct logs to the correct parser in Fluentd 
+	tags: httperr
+	
+#IIS Log file locations located uisng IIS-Log-Locator.ps1
+-   type: log
+    enabled: true  
+    paths:
+        - C:\inetpub\logs\FailedReqLogs\*.log
+        - C:\inetpub\logs\wmscvc\*.log
+        - C:\inetpub\logs\LogFiles\*\*.log
+        - D:\weblogs\*\*.log  
+    ignore_older: 0h
+    tags: w3scv
+
+#MSSQL Logs	
+#Full filepath will vary, but generally found within SSQL11.MSSQLSERVER
+-   type: log
+    enabled: true
+    paths:
+        - S:\SQLData\MSSQL11.MSSQLSERVER\MSSQL\Log\ERRORLOG*
+    ignore_older: 0h
+    tags: mssql.error
+    
+-   type: log
+    enabled: true
+    paths: 
+        - S:\SQLData\MSSQL11.MSSQLSERVER\MSSQL\Log\SQLAGENT*
+    ignore_older: 0h
+    tags: mssql.agent
+	
+
+# Example of Multi-Line Logs
+# Sitecore Application logs 
+# -   type: log
+    # enabled: true
+    # paths: 
+        # - D:\sitecore\*\docs\Data\logs\log.*
+        # - D:\sitecore\*\docs\Data\logs\crawling.*
+        # - D:\sitecore\*\docs\Data\logs\search.*
+    # ignore_older: 0h
+    ## Multiline pattern starts with each line that has a time stamp
+    # multiline.pattern: '^[A-Za-z0-9 ]+ [\d]{2}:[\d]{2}:[\d]{2} .*' 
+    # multiline.negate: true
+    # multiline.match: after
+    # tags: sitecore.logs
+
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+
+output.logstash:
+  # The Logstash hosts (your aggreator host/IP)
+  hosts: ["aggregator.domain.local"]
+
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+

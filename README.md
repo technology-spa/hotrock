@@ -29,7 +29,7 @@ The steps below will walk you through the process of building your own **EFK** s
 
 **Terraform** :
 
-+ [Terraform v0.12.x](https://releases.hashicorp.com/terraform)
++ [Terraform v0.11.x](https://releases.hashicorp.com/terraform)
 + [AWS VPC module](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 + [AWS EKS module](https://github.com/terraform-aws-modules/terraform-aws-eks)
 

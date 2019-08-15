@@ -1,4 +1,13 @@
 # Log Parsing with Fluentd 
+
+## ECS Format 
+
+As of the 7.0 release, [Elastic has published the "Elastic Common Schema"](For Index Patterns, we are using the format "beat-windows.$beatprefix". e.g. "beat-windows.audit*". ) as a guide for field names and types. We are currently in the process of conforming our indexes to these standards after upgrading. We will update our example configurations as we work through this. 
+
+The documentation below has *not* been totally conformed with ECS. 
+
+Beats will conform to this right out of the box, except for additional parsing done in Filebeat. 
+--------
 Fluentd has a number of [parser plugins](https://docs.fluentd.org/parser) to break down log files into fields to be processed in Elasticsearch. 
 
 Winlogbeat and Wazuh do not need any additional parsing. 
@@ -21,7 +30,7 @@ The current solution is not as automated as we would like, but gets the job done
 IIS logs do not have a standard location and can vary between servers. 
 They can also have custom column formats. 
 
-os.windows.conf shows an example of how to set up a parser that will parse all variants in your system
+beats-windows.conf shows an example of how to set up a parser that will parse all variants in your system
 
 To simplify this, IIS-Log-Locator.ps1 will determine unique logpaths and #Fields
 
