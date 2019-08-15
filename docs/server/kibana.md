@@ -1,20 +1,51 @@
 # Kibana
 
-[TOC]
+- [Kibana](#kibana)
+  - [Custom Docker Image (Optional)](#custom-docker-image-optional)
+  - [Install / Upgrade](#install--upgrade)
+  - [Create Index Patterns Via API](#create-index-patterns-via-api)
+    - [FluentD](#fluentd)
+    - [Optional](#optional)
+      - [AWS Lambda](#aws-lambda)
+      - [Microsoft's SIEM Agent](#microsofts-siem-agent)
+      - [Wazuh](#wazuh)
+
+## Custom Docker Image (Optional)
+
+For adding the **Wazuh** plugin or for other reasons, create and host a custom Docker image including plugins and pre-optimization (change as needed):
+
+```bash
+export KIBANA_DOCKER_TAG='v7.2.1-0' DOCKER_REPO_NAME='' DOCKER_REPO_ADDRESS='' && \
+eval $(aws ecr get-login --no-include-email) && \
+docker build -t $DOCKER_REPO_ADDRESS/$DOCKER_REPO_NAME/kibana:$KIBANA_DOCKER_TAG ./server/k8s/kibana/ && \
+docker push $DOCKER_REPO_ADDRESS/$DOCKER_REPO_NAME/kibana:$KIBANA_DOCKER_TAG && \
+unset KIBANA_DOCKER_TAG DOCKER_REPO_NAME DOCKER_REPO_ADDRESS
+```
 
 ## Install / Upgrade
 
-+ Before installing, first update the `svc_kibana` user's password in `values.yaml`.
-+ If you're using **Wazuh**, set `plugins.enabled` to `true`.
++ If you're using **Wazuh**, set `plugins.enabled` to `true`. The **Wazuh** plugin will create index patterns and templates.
+
+Create the secret containing the username/password for Kibana's service account:
+
+```bash
+kubectl apply -f './server/k8s/kibana/kibana-secrets.yaml'
+```
 
 ```bash
 # install
-helm install --name kibana --values './server/k8s/helm/kibana.yaml' stable/kibana --version 3.0.0
+helm install --name hotrock-kibana --values './server/k8s/kibana/kibana.yaml' elastic/kibana --version 7.2.1-0
 # upgrade
-helm upgrade kibana --values './server/k8s/helm/kibana.yaml' stable/kibana --version 3.0.0
+helm upgrade hotrock-kibana --values './server/k8s/kibana/kibana.yaml' elastic/kibana --version 7.2.1-0
+# delete
+helm del --purge hotrock-kibana
 ```
 
-Plugin installation can take a lot of time, so the next few commands relating to Index Patterns won't work for a few minutes. The **Wazuh** plugin will create index patterns and templates.
+Get kibana health:
+
+```bash
+curl -ks -X GET "https://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/status" -H 'kbn-xsrf: true' | jq
+```
 
 Execute the following steps internally via the **toolshed** pod.
 
@@ -25,7 +56,7 @@ Execute the following steps internally via the **toolshed** pod.
 ### FluentD
 
 ```bash
-curl -ks -X POST "http://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_objects/index-pattern/hotrock.fluentd-*" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
+curl -ks -X POST "https://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_objects/index-pattern/hotrock.fluentd-*" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
 {
   "attributes": {
      "title": "hotrock.fluentd-*",
@@ -39,7 +70,7 @@ curl -ks -X POST "http://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_obj
 #### AWS Lambda
 
 ```bash
-curl -ks -X POST "http://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_objects/index-pattern/hotrock.aws-*" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
+curl -ks -X POST "https://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_objects/index-pattern/hotrock.aws-*" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
 {
   "attributes": {
      "title": "hotrock.aws-*",
@@ -51,7 +82,7 @@ curl -ks -X POST "http://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_obj
 #### Microsoft's SIEM Agent
 
 ```bash
-curl -ks -X POST "http://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_objects/index-pattern/hotrock.mcas_siemagent-*" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
+curl -ks -X POST "https://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_objects/index-pattern/hotrock.mcas_siemagent-*" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
 {
   "attributes": {
      "title": "hotrock.mcas_siemagent-*",
@@ -73,7 +104,7 @@ curl -s https://raw.githubusercontent.com/wazuh/wazuh/3.9/extensions/elasticsear
 as well as this one:
 
 ```bash
-curl -ks -X POST "http://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_objects/index-pattern/wazuh-alerts-3.x-*" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
+curl -ks -X POST "https://${HOTROCK_ES_AUTH}@${HOTROCK_KB_SVC}:5601/api/saved_objects/index-pattern/wazuh-alerts-3.x-*" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
 {
   "attributes": {
      "title": "wazuh-alerts-3.x-*",

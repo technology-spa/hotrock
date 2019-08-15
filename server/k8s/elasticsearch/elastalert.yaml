@@ -1,0 +1,135 @@
+# number of replicas to run
+replicaCount: 1
+
+# number of helm release revisions to retain
+revisionHistoryLimit: 5
+
+# Default internal between alert checks against the elasticsearch datasource, in minutes
+runIntervalMins: 1
+
+# Default rule buffer duration, in minutes
+bufferTimeMins: 1
+
+# Amount of time to retry and deliver failed alerts (1440 minutes per day)
+alertRetryLimitMins: 2880
+
+# Default time before realerting, in minutes
+realertIntervalMins: ""
+
+# For ES 5: The name of the index which stores elastalert's statuses
+# For ES 6: The prefix of the names of indices which store elastalert's statuses.
+#
+# See https://github.com/Yelp/elastalert/commit/c250100b7be07c68a53789569a86f87193ec37f4 for more details about this differentiation.
+#
+# CAUTION: It is recommended to set this to `elastalert` for ES6+. Otherwise elastalert produces confusing index names due to https://github.com/Yelp/elastalert/issues/1479#issuecomment-356380179
+writebackIndex: elastalert
+
+# https://hub.docker.com/r/jertel/elastalert-docker/tags
+image:
+  repository: jertel/elastalert-docker
+  tag: latest-es7
+resources:
+  limit:
+    cpu: 100m
+    memory: 300Mi
+  requests:
+    cpu: 10m
+    memory: 300Mi
+
+elasticsearch:
+  # elasticsearch endpoint e.g. (svc.namespace||svc)
+  host: "hotrock-es-master.default.svc.cluster.local"
+  # elasticsearch port
+  port: 9200
+  # whether or not to connect to es_host using TLS
+  useSsl: "True"
+  # Username if authenticating to ES with basic auth
+  username: "svc_elastalert"
+  # Password if authenticating to ES with basic auth
+  password: "hz1blUdPtEH14cEXsfqepxbfdaIsCEgBKh9OZCZGrgFg4vcX5xuBDUYzhz94WzJq"
+  # whether or not to verify TLS certificates
+  verifyCerts: "True"
+  # Enable certificate based authentication
+  # path to a PEM certificate to use as the client certificate
+  # clientCert: "/certs/client.pem"
+  # path to a private key file to use as the client key
+  # clientKey: "/certs/client-key.pem"
+  # path to a CA cert bundle to use to verify SSL connections
+  caCerts: "/certs/elastic-certificate.pem"
+  # certs volumes, required to mount ssl certificates when elasticsearch has tls enabled
+  certsVolumes:
+    - name: hotrock-es-certificate-pem
+      secret:
+        defaultMode: 420
+        secretName: hotrock-es-certificate-pem
+  # mount certs volumes, required to mount ssl certificates when elasticsearch has tls enabled
+  certsVolumeMounts:
+    - name: hotrock-es-certificate-pem
+      mountPath: /certs
+      readOnly: true
+
+extraConfigOptions: {}
+  # # Options to propagate to all rules, e.g. a common slack_webhook_url or kibana_url
+  # # Please note at the time of implementing this value, it will not work for required_locals
+  # # Which MUST be set at the rule level, these are: ['alert', 'type', 'name', 'index']
+  # generate_kibana_link: true
+  # kibana_url: https://kibana.yourdomain.com
+  # slack_webhook_url: dummy
+
+# Command and args override for container e.g. (https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
+# command: ["YOUR_CUSTOM_COMMAND"]
+# args: ["YOUR", "CUSTOM", "ARGS"]
+
+# rule configurations e.g. (http://elastalert.readthedocs.io/en/latest/)
+rules:
+  test_slack: |-
+    ---
+    name: Test Slack
+    type: frequency
+    index: hotrock.fluentd-*
+    num_events: 5
+    timeframe:
+      minutes: 2
+    filter:
+    - term:
+        eyeColor: "blue"
+    alert:
+    - "slack"
+    slack:
+    slack_webhook_url: "YOUR HOOK URL HERE"
+  # test_wazuh: |-
+  #   ---
+  #   name: Authentication Failure detected by Wazuh
+  #   type: frequency
+  #   index: wazuh-alerts-3.x-*
+  #   num_events: 1
+  #   timeframe:
+  #     minutes: 5
+  #   filter:
+  #   - term:
+  #       rule.id: 60122
+  #   alert:
+  #   - "slack"
+  #   slack:
+  #   slack_webhook_url: "YOUR HOOK URL HERE"
+
+# Support using node selectors and tolerations
+# nodeSelector:
+#   "node-role.kubernetes.io/infra_worker": "true"
+nodeSelector:
+  hotrock_monitoring: "true"
+
+service:
+  annotations: {}
+  enabled: true
+  type: "ClusterIP"
+  port: 3030
+
+# tolerations:
+#   - key: "node_role"
+#     operator: "Equal"
+#     value: "infra_worker"
+#     effect: "NoSchedule"
+tolerations: []
+
+extraVolumes: []

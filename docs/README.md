@@ -23,10 +23,10 @@ find . -type f \( -name "*.yaml" -o -name "*.tf" -o -name "*.tf.disabled" \) -ex
 To create a functioning EFK cluster, follow the links below:
 
 1. [Cluster Creation](server/cluster-management.md)
-2. [Elasticsearch](server/elasticsearch.md)
+2. [Elasticsearch](server/elasticsearch.md) (Optional [ElastAlert](server/elastalert.md))
 3. [Kibana](server/kibana.md)
 4. [Fluentd](server/fluentd.md)
-5. [Nginx](server/nginx.md)
+5. [Nginx Ingress Controller](server/nginx.md)
 
 Once complete, you should see the below pods:
 
@@ -55,7 +55,8 @@ kube-system      kube-proxy-xlpbw                                           1/1 
 kube-system      tiller-deploy-7b659b7fbd-nw4z5                             1/1     Running   0          3d1h
 
 ```
-# **Shipping Data to Hotrock**
+
+## Shipping Data to Hotrock
 
 In order to ship data securely, a Fluentd instance (aggregator) must be running in your environment. All the data collected from individual servers will be shipped into the aggregator where it will be encrypted and securely transferred to the Hotrock cluster. 
 
@@ -63,15 +64,14 @@ The provided example Fluentd configuration has the following setup:
 - Data will be collected by Elastic Beats and Wazuh
 - Beats will ship data to Aggregator on port 5044
 - Aggregator will encrypt and forward the data to the Ingestor 
-- 
 
 To configure these inputs: 
+
 1. [Aggregator Configuration](client/aggregator.md)
-
 2. [Elastic Beat Deployment and Configuration](client/beats-deployment.md)
-
 3. [Wazuh Agent Deployment](client/wazuh-deployment.md)
-
 4. [Log Parsing](client/log-parsing.md)
 
+## Upgrading
 
+See [upgrade instructions](../server/upgrading.md)

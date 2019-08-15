@@ -23,13 +23,13 @@ foreach ($server in $servers){
     .\agent-auth -m $auth_server -P $auth_password
 	Copy-Item "C:\temp\ossec.conf" "C:\Program Files (x86)\ossec-agent"
 	Remove-Item wazuh-agent-latest.msi
-	Remove-Item "C:\temp\chipper_file.txt"
+	Remove-Item "C:\temp\hotrock_file.txt"
 	Remove-Item "C:\temp\ossec.conf"
     Start-Service Wazuh
 	
     }
    	#If modifications are made to ossec.conf: 
-    #Copy-Item –Path "\\prod.hosting\NETLOGON\Chipper\wazuh\ossec.conf" –Destination "\\$server\c$\temp"
+    #Copy-Item –Path "\\prod.hosting\NETLOGON\hotrock\wazuh\ossec.conf" –Destination "\\$server\c$\temp"
     Invoke-Command -ComputerName $server -ScriptBlock $script  
 }
 

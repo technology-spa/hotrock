@@ -1,5 +1,22 @@
 # https://github.com/terraform-providers/terraform-provider-aws/blob/master/CHANGELOG.md
-provider "aws" { version = "~> 2.0" region  = "${var.region}" }
-provider "local" { version = "~> 1.1.0" }
-provider "null" { version = "~> 1.0.0" }
-provider "template" { version = "~> 1.0.0" }
+
+# https://github.com/terraform-providers/terraform-provider-aws/releases
+provider "aws" {
+  version = "= 2.23.0"
+  region  = var.region
+}
+
+# https://github.com/terraform-providers/terraform-provider-local/releases
+provider "local" {
+  version = "= 1.3.0"
+}
+
+# https://github.com/terraform-providers/terraform-provider-null/releases
+provider "null" {
+  version = "= 2.1.2"
+}
+
+# https://github.com/terraform-providers/terraform-provider-template/releases
+provider "template" {
+  version = "= 2.1.2"
+}
