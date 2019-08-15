@@ -108,20 +108,24 @@ EOF
 
 # https://github.com/claranet/terraform-aws-lambda
 module "lambda" {
-  source                         = "github.com/claranet/terraform-aws-lambda?ref=v0.x.x"
-  version                        = "= v0.12.0"
+  // source                         = "github.com/claranet/terraform-aws-lambda?ref=v0.x.x"
+  source                         = "github.com/claranet/terraform-aws-lambda?ref=v1.1.0"
   function_name                  = "${local.cluster_name}-lambda"
   description                    = "Push VPC flow logs to Fluentd"
   handler                        = "vpc-flow-logs.handler"
   runtime                        = "python3.6"
   timeout                        = "120"
-  enable_cloudwatch_logs         = "true"
+  // enable_cloudwatch_logs         = "true"
+  cloudwatch_logs                = "true"
   # set to "0" to disable lambda
   reserved_concurrent_executions = "5"
   source_path                    = "${path.cwd}/lambda/vpc-flow-logs.py"
-  attach_dead_letter_config      = false
-  environment {
-    variables {
+  // Add a dead letter queue.
+  // dead_letter_config = {
+  //   target_arn = aws_sqs_queue.dlq.arn
+  // }
+  environment = {
+    variables = {
       SCHEMA = "http://"
       HOST   = "hotrock-fd-int.domain.tld"
       PORT   = "80"
@@ -129,8 +133,8 @@ module "lambda" {
       TAG    = "hotrock.aws"
     }
   }
-  attach_vpc_config = true
-  vpc_config {
+  // attach_vpc_config = true
+  vpc_config = {
     subnet_ids         = ["${module.vpc.private_subnets[4]}", "${module.vpc.private_subnets[5]}"]
     security_group_ids = ["${aws_security_group.lambda_to_k8s_http.id}"]
   }

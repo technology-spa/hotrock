@@ -1,4 +1,4 @@
-# **Aggregator Set Up** 
+# **Aggregator Set Up**
 
 ## **Aggregator Requirements**
 

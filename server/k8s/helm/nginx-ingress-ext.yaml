@@ -5,7 +5,7 @@ controller:
   name: controller
   image:
     repository: quay.io/kubernetes-ingress-controller/nginx-ingress-controller
-    tag: "0.24.1"
+    tag: "0.25.0"
     pullPolicy: IfNotPresent
     # www-data -> uid 33
     runAsUser: 33
@@ -164,10 +164,10 @@ controller:
   resources: 
     limits:
       cpu: 1
-      memory: 300Mi
+      memory: 500Mi
     requests:
       cpu: 10m
-      memory: 300Mi
+      memory: 100Mi
 
   autoscaling:
     enabled: false

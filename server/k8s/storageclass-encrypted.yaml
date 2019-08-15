@@ -4,9 +4,64 @@ kind: StorageClass
 metadata:
   labels:
     k8s-addon: storage-aws.addons.k8s.io
-  name: gp2-encrypted
+  name: gp2
 parameters:
   type: gp2
   encrypted: "true"
 provisioner: kubernetes.io/aws-ebs
 reclaimPolicy: Delete
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+    k8s-addon: storage-aws.addons.k8s.io
+  name: gp2-encrypted-delete
+parameters:
+  type: gp2
+  encrypted: "true"
+provisioner: kubernetes.io/aws-ebs
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+    k8s-addon: storage-aws.addons.k8s.io
+  name: gp2-encrypted-retain
+parameters:
+  type: gp2
+  encrypted: "true"
+provisioner: kubernetes.io/aws-ebs
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+    k8s-addon: storage-aws.addons.k8s.io
+  name: io1-encrypted-delete
+parameters:
+  type: io1
+  encrypted: "true"
+provisioner: kubernetes.io/aws-ebs
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+    k8s-addon: storage-aws.addons.k8s.io
+  name: io1-encrypted-retain
+parameters:
+  type: io1
+  encrypted: "true"
+provisioner: kubernetes.io/aws-ebs
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain

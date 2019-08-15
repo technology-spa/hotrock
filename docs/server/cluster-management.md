@@ -1,11 +1,17 @@
 # Cluster Management
 
-[TOC]
+- [Cluster Management](#cluster-management)
+  - [Helm Initialization](#helm-initialization)
+  - [Cluster Teardown](#cluster-teardown)
+  - [What next?](#what-next)
+      - [Metrics-Server (Optional)](#metrics-server-optional)
+      - [MCAS SIEM Agent (Optional)](#mcas-siem-agent-optional)
+      - [VPC Flow Logs With Lambda and Fluentd (Optional)](#vpc-flow-logs-with-lambda-and-fluentd-optional)
 
 1. Clone this repo:
 
 ```bash
-git clone https://github.com/technology-spa/HOTROCK && cd server/aws
+git clone https://github.com/technology-spa/hotrock && cd server/aws
 ```
 
 2. Make edits to values in [`variables.tf`](../../server/aws/variables.tf) as-desired.
@@ -22,13 +28,7 @@ terraform init && terraform validate && terraform plan -out="planfile" -detailed
 terraform apply "planfile"
 ```
 
-5. Switch directories
-
-```bash
-cd ../../
-```
-
-6. Ensure the proper `kubeconfig` is located at `~/.kube/config`, or splice it and dice it. The `terraform-eks-aws` module will download it to `./server/aws/` by default. If you already have a `kubeconfig` file and need to merge the new one with your current one, try:
+5. Ensure the proper `kubeconfig` is located at `~/.kube/config`, or splice it and dice it. The `terraform-eks-aws` module will download it to `./server/aws/` by default. If you already have a `kubeconfig` file and need to merge the new one with your current one, try:
 
 ```bash
 KUBECONFIG=~/.kube/config:./kubeconfig_hotrock-dev kubectl config view --flatten
@@ -36,7 +36,7 @@ KUBECONFIG=~/.kube/config:./kubeconfig_hotrock-dev kubectl config view --flatten
 
 You can then paste the output to `~/.kube/config`.
 
-7. Identify and switch contexts to newly-created cluster:
+6. Identify and switch contexts to newly-created cluster:
 
 ```bash
 kubectl config get-contexts
@@ -46,7 +46,7 @@ kubectl config get-contexts
 kubectl config use-context NAME_OF_CONTEXT
 ```
 
-8. Test access to the cluster with:
+7. Test access to the cluster with:
 
 ```bash
 kubectl get nodes; kubectl get pods --all-namespaces
@@ -60,6 +60,12 @@ kube-system   aws-node-m8bcr             1/1     Running   0          39m
 kube-system   coredns-65f768bbc8-scwnj   1/1     Running   0          42m
 kube-system   coredns-65f768bbc8-vntqq   1/1     Running   0          42m
 kube-system   kube-proxy-8vjxv           1/1     Running   0          39m
+```
+
+8. Return to the root directory of the project:
+
+```bash
+cd ../../
 ```
 
 ## Helm Initialization
@@ -83,20 +89,24 @@ helm init --service-account tiller --upgrade
 3. Create a new `storageclass` and set to default so that any volumes created will be on encrypted EBS volumes:
 
 ```bash
-kubectl create -f './server/k8s/storageclass-encrypted.yaml'; \
+kubectl apply -f './server/k8s/storageclass-encrypted.yaml'; \
 kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.beta.kubernetes.io/is-default-class":"false"}}}'; \
 kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'; \
-kubectl patch storageclass gp2-encrypted -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'; \
+kubectl patch storageclass gp2-encrypted-delete -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'; \
 kubectl get storageclass
 ```
 
 ## Cluster Teardown
+
+When ready to teardown your cluster, make sure that objects created in **AWS** from **k8s** are deleted, else there could be errors when **AWS** deletes resources.
 
 ```bash
 helm del --purge nginx-ext; \
 cd ./server/aws/ && \
 terraform init && terraform validate && terraform plan -destroy -out="planfile" -detailed-exitcode
 ```
+
+After reviewing the plan, run:
 
 ```bash
 terraform apply 'planfile'
@@ -115,16 +125,16 @@ With `metrics-server` running in your cluster, you can get resource utilization 
 
 ```bash
 # install
-helm install --namespace kube-system --name metrics-server --values './server/k8s/helm/metrics-server.yaml' stable/metrics-server --version 2.8.1
+helm install --namespace kube-system --name metrics-server --values './server/k8s/helm/metrics-server.yaml' stable/metrics-server --version 2.8.2
 # upgrade
-helm --debug upgrade metrics-server stable/metrics-server --values './server/k8s/helm/metrics-server.yaml' --recreate-pods
+helm upgrade metrics-server stable/metrics-server --values './server/k8s/helm/metrics-server.yaml' --version 2.8.2 --recreate-pods
 ```
 
 #### MCAS SIEM Agent (Optional)
 
-+ See [Helm chart](https://github.com/technology-spa/HOTROCK/charts/mcas-siemagent) for info
++ See [Helm chart](https://github.com/technology-spa/hotrock/tree/master/charts/mcas-siemagent) for info.
 
-Create the secret that holds the token for the agent:
+Obtain the token from Microsoft, then create the secret that holds the token for the agent:
 
 ```bash
 kubectl apply -f './charts/mcas-siemagent/mcas-siemagent-env-secrets.yaml'
@@ -132,10 +142,8 @@ kubectl apply -f './charts/mcas-siemagent/mcas-siemagent-env-secrets.yaml'
 
 ```bash
 # install
-# helm install --name metrics-server hotrock/mcas-siemagent --version 0.1.0
 helm install --name mcas-siemagent './charts/mcas-siemagent'
 # upgrade
-# helm --debug upgrade mcas-siemagent charts/mcas-siemagent --version 0.1.0 --recreate-pods
 helm upgrade mcas-siemagent './charts/mcas-siemagent' --recreate-pods
 # delete
 helm del --purge mcas-siemagent
@@ -149,18 +157,18 @@ helm del --purge mcas-siemagent
 
 ```bash
 # install
-helm install --name fluentd-int --values './server/k8s/helm/fluentd-int.yaml' stable/fluentd --version 1.10.0
+helm install --name fluentd-int --values './server/k8s/fluentd/fluentd-int.yaml' stable/fluentd --version 1.10.0
 # upgrade
-helm upgrade fluentd-int --values './server/k8s/helm/fluentd-int.yaml' stable/fluentd --version 1.10.0
+helm upgrade fluentd-int --values './server/k8s/fluentd/fluentd-int.yaml' stable/fluentd --version 1.10.0
 ```
 
 2. Install **Nginx**-Ingress:
 
 ```bash
 # install
-helm install --name nginx-int --values './server/k8s/helm/nginx-ingress-int.yaml' stable/nginx-ingress --version 1.6.18
+helm install --name nginx-int --values './server/k8s/helm/nginx-ingress-int.yaml' stable/nginx-ingress --version 1.11.5
 # upgrade
-helm upgrade nginx-int --values './server/k8s/helm/nginx-ingress-int.yaml' stable/nginx-ingress --version 1.6.18
+helm upgrade nginx-int --values './server/k8s/helm/nginx-ingress-int.yaml' stable/nginx-ingress --version 1.11.5
 ```
 
 3. Rename `server/aws/lambda.tf.diasbled` to `server/aws/lambda.tf` and update if needed. `terraform apply` to create the resources.
