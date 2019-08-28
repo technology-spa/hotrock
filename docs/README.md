@@ -74,4 +74,4 @@ To configure these inputs:
 
 ## Upgrading
 
-See [upgrade instructions](../server/upgrading.md)
+See [upgrade instructions](server/upgrading.md)
