@@ -9,6 +9,7 @@
     - [Healthcheck](#healthcheck)
     - [Wazuh](#wazuh)
     - [Kibana](#kibana)
+    - [Filebeat (k8s)](#filebeat-k8s)
     - [Fluentd](#fluentd)
     - [ElastAlert](#elastalert)
 
@@ -69,10 +70,10 @@ for i in ELASTIC_USERNAME ELASTIC_PASSWORD; do echo $(kubectl get secret hotrock
 2. **Run all next steps** from a container in the cluster that has access to the **Elasticsearch** service and pods, so that you can query the API. You can probably get a shell in an **Elasticsearch** container and do this, but it'll lack `jq`.  Here's a recommended example:
 
 ```bash
-kubectl run -it --rm --restart=Never toolshed --image=chicken231/toolshed:latest --limits="memory=100Mi"
+kubectl run -it --rm --restart=Never toolshed --image=chicken231/toolshed:latest --labels 'co.elastic.logs/enabled=false,run=toolshed'
 ```
 
-3. Export environment variables, setting credentials that are used in subequent `curl` commands against the **Elasticsearch** and **Kibana** APIs:
+3. Export environment variables, setting credentials that are used in subsequent `curl` commands against the **Elasticsearch** and **Kibana** APIs:
 
 ```bash
 export HOTROCK_ES_SVC='hotrock-es' && \
@@ -81,6 +82,7 @@ export HOTROCK_ES_AUTH='elastic:PASSWORD_HERE' && \
 export HOTROCK_KIBANA_PASSWORD='PASSWORD_HERE' && \
 export HOTROCK_WAZUH_API_PASSWORD='PASSWORD_HERE' && \
 export HOTROCK_FLUENTD_PASSWORD='PASSWORD_HERE' && \
+export HOTROCK_FILEBEAT_PASSWORD='PASSWORD_HERE' && \
 export HOTROCK_ELASTALERT_PASSWORD='PASSWORD_HERE'
 ```
 
@@ -180,6 +182,40 @@ curl -ks -X PUT "https://${HOTROCK_ES_AUTH}@${HOTROCK_ES_SVC}:9200/_security/use
   }
 }' | jq
 ```
+
+### Filebeat (k8s)
+
+Create the user and role for **FluentD** to create and manipulate any index:
+
+```bash
+curl -ks -X PUT "https://${HOTROCK_ES_AUTH}@${HOTROCK_ES_SVC}:9200/_security/role/filebeat" -H 'Content-Type: application/json' -d'
+{
+  "cluster": ["read_ilm"],
+  "indices": [
+    {
+      "names": ["hotrock.filebeat-*"],
+      "privileges": ["all"]
+    }
+  ],
+  "metadata" : {
+    "chipper" : true
+  }
+}' | jq
+```
+
+```bash
+curl -ks -X PUT "https://${HOTROCK_ES_AUTH}@${HOTROCK_ES_SVC}:9200/_security/user/svc_filebeat" -H 'Content-Type: application/json' -d'
+{
+  "password" : "'"${HOTROCK_FILEBEAT_PASSWORD}"'",
+  "roles" : ["filebeat", "monitor"],
+  "full_name" : "",
+  "email" : "",
+  "metadata" : {
+    "chipper" : true
+  }
+}' | jq
+```
+
 
 ### Fluentd
 

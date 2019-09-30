@@ -1,0 +1,123 @@
+---
+# Allows you to add any config files in /usr/share/filebeat
+# such as filebeat.yml
+filebeatConfig:
+  filebeat.yml: |
+    setup.template.enabled: false
+    setup.template.name: "filebeat"
+    setup.template.pattern: "filebeat-*"
+    setup.ilm.enabled: false
+    logging.metrics.enabled: false
+    filebeat.inputs:
+    - type: docker
+      containers.ids:
+      - '*'
+      processors:
+      - add_kubernetes_metadata:
+          in_cluster: true
+    output.elasticsearch:
+      protocol: https
+      hosts: ["hotrock-es-master.client.svc.cluster.local:9200"]
+      username: '${ELASTICSEARCH_USERNAME}'
+      password: '${ELASTICSEARCH_PASSWORD}'
+      ssl.certificate_authorities: ["/usr/share/filebeat/certs/elastic-certificate.pem"]
+      index: "hotrock.filebeat-%{+yyyy.MM.dd}"
+
+# Extra environment variables to append to the DaemonSet pod spec.
+# This will be appended to the current 'env:' key. You can use any of the kubernetes env
+# syntax here
+extraEnvs:
+  - name: 'ELASTICSEARCH_USERNAME'
+    valueFrom:
+      secretKeyRef:
+        name: filebeat-credentials
+        key: ELASTICSEARCH_USERNAME
+  - name: 'ELASTICSEARCH_PASSWORD'
+    valueFrom:
+      secretKeyRef:
+        name: filebeat-credentials
+        key: ELASTICSEARCH_PASSWORD
+
+extraVolumeMounts: ""
+  # - name: extras
+  #   mountPath: /usr/share/extras
+  #   readOnly: true
+
+extraVolumes: ""
+  # - name: extras
+  #   emptyDir: {}
+
+# Root directory where Filebeat will write data to in order to persist registry data across pod restarts (file position and other metadata).
+hostPathRoot: /var/lib
+
+image: "docker.elastic.co/beats/filebeat"
+imageTag: "7.2.1"
+imagePullPolicy: "IfNotPresent"
+imagePullSecrets: []
+
+livenessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+
+readinessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+
+# Whether this chart should self-manage its service account, role, and associated role binding.
+managedServiceAccount: true
+
+# additionals labels
+labels: {}
+
+podAnnotations: {}
+  # iam.amazonaws.com/role: es-cluster
+
+# Various pod security context settings. Bear in mind that many of these have an impact on Filebeat functioning properly.
+#
+# - User that the container will execute as. Typically necessary to run as root (0) in order to properly collect host container logs.
+# - Whether to execute the Filebeat containers as privileged containers. Typically not necessarily unless running within environments such as OpenShift.
+podSecurityContext:
+  runAsUser: 0
+  privileged: false
+
+resources:
+  requests:
+    cpu: "10m"
+    memory: "50Mi"
+  limits:
+    cpu: "200m"
+    memory: "150Mi"
+
+# Custom service account override that the pod will use
+serviceAccount: ""
+
+# A list of secrets and their paths to mount inside the pod
+# This is useful for mounting certificates for security other sensitive values
+secretMounts:
+  - name: hotrock-es-certificates-pem
+    secretName: hotrock-es-certificates-pem
+    path: /usr/share/filebeat/certs
+
+# How long to wait for Filebeat pods to stop gracefully
+terminationGracePeriod: 60
+
+tolerations: []
+
+nodeSelector: {}
+
+affinity: {}
+
+# This is the PriorityClass settings as defined in
+# https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
+priorityClassName: ""
+
+updateStrategy: RollingUpdate
+
+# Override various naming aspects of this chart
+# Only edit these if you know what you're doing
+nameOverride: "hotrock"
+fullnameOverride: ""

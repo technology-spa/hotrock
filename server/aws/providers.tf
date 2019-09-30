@@ -2,7 +2,7 @@
 
 # https://github.com/terraform-providers/terraform-provider-aws/releases
 provider "aws" {
-  version = "= 2.23.0"
+  version = "= 2.30.0"
   region  = var.region
 }
 

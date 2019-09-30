@@ -9,6 +9,7 @@
       - [AWS Lambda](#aws-lambda)
       - [Microsoft's SIEM Agent](#microsofts-siem-agent)
       - [Wazuh](#wazuh)
+    - [Timelion](#timelion)
 
 ## Custom Docker Image (Optional)
 

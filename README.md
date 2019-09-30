@@ -29,7 +29,7 @@ The steps below will walk you through the process of building your own **EFK** s
 
 **Terraform** :
 
-+ [Terraform v0.11.x](https://releases.hashicorp.com/terraform)
++ [Terraform v0.12.x](https://releases.hashicorp.com/terraform)
 + [AWS VPC module](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 + [AWS EKS module](https://github.com/terraform-aws-modules/terraform-aws-eks)
 
@@ -55,19 +55,19 @@ And **Kubernetes** resources:
 
 Some alterations to the files in this project may be needed for other versions. This was tested on versions:
 
-+ AWS EKS `1.12.7` (Workers)
-+ Elasticsearch/Kibana `7.1.1`
-+ Wazuh `3.9.2`
-+ Helm `2.13.x`+
++ AWS EKS `v1.13.x`
++ Elasticsearch `v7.2.1`
++ Kibana `v7.2.0`
++ Filebeat (server logs) `v7.2.1`
++ Wazuh `v3.9.3`
++ Helm `v2.13.x`+
 + FluentD `v1.3.x`
-+ Fluent Bit `v1.1.x`
 + Elastic Beats `v7.1`
 
 ## Assumptions / Limitations
 
 + You have previous experience working wtih **Kubernetes** and Helm charts.
 + **Kibana**, **Fluentd** (HTTP/JSON log ingestion), and **Wazuh** (event auth and events) will be to be accessible from the internet through the **Nginx** Ingress Controller.
-+ As of ECK version `0.8.0`, there's no method for installing **Kibana** plugins (Needed for **Wazuh**). Therefore, `stable/kibana` chart is used instead.
 + You want to deploy this stack programmatically through API calls with `cURL`. The only thing you need to do in a GUI is selecting the default Index Pattern in **Kibana**.
-+ You want the option of creating fairly strict RBAC resources to have a reasonably secure foundation for your EFK cluster.
++ You want the option of creating fairly strict RBAC resources to have a reasonably secure foundation for your EFK environment.
 + You enjoy having an **A+** on [SSL Labs](https://www.ssllabs.com/).
