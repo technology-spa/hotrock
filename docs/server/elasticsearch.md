@@ -26,7 +26,7 @@ helm repo add elastic https://helm.elastic.co
 [Generate certificates](https://github.com/elastic/helm-charts/tree/master/elasticsearch#security). The script is a modified version of a `makefile` in the helm repo's examples for creating an `xpack.security` enabled cluster:
 
 ```bash
-bash /server/k8s/efk/xpack-security.sh
+bash /server/k8s/elasticsearch/xpack-security.sh
 ```
 
 It will generate certs, the encryption key for Kibana's cookies, and the password for the `elastic` user.
